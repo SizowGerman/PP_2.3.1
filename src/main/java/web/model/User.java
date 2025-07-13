@@ -1,7 +1,7 @@
 package web.model;
 
 import javax.persistence.*;
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 import java.util.Objects;
 
 @Entity
@@ -13,13 +13,14 @@ public class User {
     private Long id;
 
     @Column(name = "name")
-    @NotBlank(message = "Имя обязательно")
-    @Pattern(regexp = "^[а-яА-ЯёЁa-zA-Z\\s\\-']+$", message = "Имя может содержать только буквы, пробелы, дефисы и апострофы")
+    @NotBlank(message = "Name is required")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ\\s\\-']+$",
+            message = "Name can only contain letters, spaces, hyphens and apostrophes")
     private String name;
 
     @Column(name = "email")
-    @NotBlank(message = "Email обязателен")
-    @Email(message = "Некорректный email")
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
     private String email;
 
     public Long getId() {

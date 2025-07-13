@@ -31,12 +31,19 @@
         .hidden {
             display: none;
         }
+        .error {
+            color: red;
+            font-size: 0.8em;
+        }
+        .error-input {
+            border: 1px solid red;
+        }
     </style>
 </head>
 <body>
 <h1>Users</h1>
 
-<!-- Таблица USER -->
+<!-- User Table -->
 <table>
     <tr>
         <th>ID</th>
@@ -50,17 +57,40 @@
     </tr>
 </table>
 
-<!-- Добавить -->
+
+<!-- Message Display Section -->
+<div th:if="${error}" class="alert alert-danger" style="color: red; padding: 10px; margin: 10px 0; border: 1px solid red;">
+    <span th:text="${error}"></span>
+</div>
+
+<div th:if="${success}" class="alert alert-success" style="color: green; padding: 10px; margin: 10px 0; border: 1px solid green;">
+    <span th:text="${success}"></span>
+</div>
+
+<!-- Add New User Form -->
 <div class="controls">
     <h2>Add New User</h2>
-    <form th:action="@{/users/add}" method="post">
-        <input type="text" name="name" placeholder="Name" required>
-        <input type="email" name="email" placeholder="Email" required>
+    <form th:action="@{/users/add}" method="post" th:object="${user}">
+        <div>
+            <label>Name:</label>
+            <input type="text" th:field="*{name}"
+                   pattern="[a-zA-Zа-яА-ЯёЁ\s\-']+"
+                   title="Only letters, spaces, hyphens and apostrophes allowed"
+                   required>
+            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error"></span>
+        </div>
+
+        <div>
+            <label>Email:</label>
+            <input type="email" th:field="*{email}" required>
+            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></span>
+        </div>
+
         <button type="submit">Add User</button>
     </form>
 </div>
 
-<!-- Искать пользователя -->
+<!-- Search and Manage User -->
 <div class="controls">
     <h2>Manage User</h2>
     <form id="searchForm">
@@ -70,19 +100,30 @@
         <button type="button" onclick="searchUser()">Find User</button>
     </form>
 
-    <!-- Если найдено ID -->
     <div id="userManagementSection" class="hidden">
         <h3>Manage User ID: <span id="userIdDisplay"></span></h3>
 
-        <!-- Редактировать -->
         <form th:action="@{/users/update}" method="post" id="editForm">
             <input type="hidden" name="id" id="editUserId">
-            <label>Name: <input type="text" name="name" id="editName" required></label>
-            <label>Email: <input type="email" name="email" id="editEmail" required></label>
+
+            <div>
+                <label>Name:</label>
+                <input type="text" name="name" id="editName"
+                       pattern="[a-zA-Zа-яА-ЯёЁ\s\-']+"
+                       title="Only letters, spaces, hyphens and apostrophes allowed"
+                       required>
+                <span id="editNameError" class="error"></span>
+            </div>
+
+            <div>
+                <label>Email:</label>
+                <input type="email" name="email" id="editEmail" required>
+                <span id="editEmailError" class="error"></span>
+            </div>
+
             <button type="submit">Update User</button>
         </form>
 
-        <!-- Удалить -->
         <form th:action="@{/users/delete}" method="post" style="margin-top: 10px;">
             <input type="hidden" name="id" id="deleteUserId">
             <button type="submit" style="background-color: #ffcccc;">Delete User</button>
@@ -90,21 +131,20 @@
     </div>
 </div>
 
-<!-- JavaScript для поиска и обслуживания поиска -->
 <script th:inline="javascript">
+    /*<![CDATA[*/
+    const users = /*[[${users}]]*/ [];
+
     function searchUser() {
-
-        const searchId = document.getElementById('searchId').value;
-        const users = JSON.parse('[[${users}]]'.replace(/&quot;/g, '"'));
-
+        const searchId = parseInt(document.getElementById('searchId').value);
         const foundUser = users.find(user => user.id == searchId);
 
         if (foundUser) {
             document.getElementById('userIdDisplay').textContent = foundUser.id;
             document.getElementById('editUserId').value = foundUser.id;
             document.getElementById('deleteUserId').value = foundUser.id;
-            document.getElementById('editName').value = foundUser.name;
-            document.getElementById('editEmail').value = foundUser.email;
+            document.getElementById('editName').value = foundUser.name || '';
+            document.getElementById('editEmail').value = foundUser.email || '';
 
             document.getElementById('userManagementSection').classList.remove('hidden');
         } else {
@@ -112,6 +152,7 @@
             document.getElementById('userManagementSection').classList.add('hidden');
         }
     }
+    /*]]>*/
 </script>
 </body>
 </html>
