@@ -19,7 +19,6 @@ public class UserRepo {
         return entityManager.createQuery("from User", User.class).getResultList();
     }
 
-    @Transactional
     public void save(User user) {
         entityManager.persist(user);
     }
@@ -28,12 +27,10 @@ public class UserRepo {
         return entityManager.find(User.class, id);
     }
 
-    @Transactional
     public void update(User user) {
         entityManager.merge(user);
     }
 
-    @Transactional
     public void delete(long id) {
         User user = entityManager.find(User.class, id);
         if (user != null) {
