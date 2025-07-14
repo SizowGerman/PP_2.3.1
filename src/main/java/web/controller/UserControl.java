@@ -15,8 +15,12 @@ import javax.validation.Valid;
 @RequestMapping("/users")
 public class UserControl {
 
-    @Autowired
     private UserService userService;
+
+    @Autowired
+    public UserControl(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public String listUsers(Model model) {
